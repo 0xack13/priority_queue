@@ -10,7 +10,7 @@ build: clean
 
 test:
 	py.test tests/* \
-		--cov dbgr \
+		--cov priority_queue \
 		--cov-config .coveragerc \
 		--cov-report html \
 		--cov-report term \

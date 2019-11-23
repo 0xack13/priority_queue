@@ -1,8 +1,7 @@
 import itertools
 import heapq
+from queue import Empty, Full
 
-class EmptyError(Exception):
-    pass
 
 
 class Node:
@@ -27,18 +26,33 @@ class Node:
 
 
 class PriorityQueue:
-    def __init__(self):
+    def __init__(self, maxsize=0):
+        self.maxsize = maxsize
+        self.count = 0
         self.heap = [] # Items organized in heap
         self.entry_finder = {} # Map of items to find if item already is in queue
-        self.counter = itertools.count() # Items counter to keep sorting stable
+        self.index = itertools.count() # Items indexer to keep sorting stable
+
+    def full(self):
+        return self.maxsize > 0 and self.count >= self.maxsize
+
+    def qsize(self):
+        return self.count
+
+    def empty(self):
+        return self.count == 0
 
     def put(self, value, priority):
         if value in self.entry_finder:
             orig_node = self._pop_node_by_value(value)
             priority += orig_node.priority
-        node = Node(value, priority, next(self.counter))
+            self.count -= 1
+        if self.full():
+            raise Full
+        node = Node(value, priority, next(self.index))
         self.entry_finder[value] = node
         heapq.heappush(self.heap, node)
+        self.count += 1
 
     def _pop_node_by_value(self, value):
         node = self.entry_finder.pop(value)
@@ -50,5 +64,6 @@ class PriorityQueue:
             node = heapq.heappop(self.heap)
             if node:
                 del self.entry_finder[node.value]
+                self.count -= 1
                 return node.value
-        raise EmptyError()
+        raise Empty()

@@ -1,10 +1,10 @@
 import pytest
 
-from priority_queue.queue import Node
+from priority_queue.pqueue import Node
 
 
 def test_create_node():
-    node = Node('A', 2, 3) 
+    node = Node('A', 2, 3)
     assert node.value == 'A'
     assert node.priority == 2
     assert node.order == 3

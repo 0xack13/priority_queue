@@ -1,64 +1,117 @@
 import pytest
 
-from priority_queue.queue import PriorityQueue, EmptyError
+from priority_queue.pqueue import PriorityQueue
+from queue import Empty, Full
 
 
 def test_get_empty():
     q = PriorityQueue()
-    with pytest.raises(EmptyError):
+    with pytest.raises(Empty):
         q.get()
 
 
 def test_put_get_one_item():
     q = PriorityQueue()
-    q.put(42, 0)
-    assert q.get() == 42
+    q.put('A', 0)
+    assert q.get() == 'A'
 
 
 def test_get_removes_item():
     q = PriorityQueue()
-    q.put(42, 0)
+    q.put('A', 0)
     q.get()
-    with pytest.raises(EmptyError):
+    with pytest.raises(Empty):
         q.get()
 
 
 def test_get_reflects_priority():
     q = PriorityQueue()
-    q.put(42, 0)
-    q.put(3.14 , 1)
-    assert q.get() == 3.14
-    assert q.get() == 42
+    q.put('A', 0)
+    q.put('B', 1)
+    assert q.get() == 'B'
+    assert q.get() == 'A'
 
 
 def test_get_stable_ordering():
     q = PriorityQueue()
-    q.put(42, 0)
-    q.put(3.14 , 0)
-    assert q.get() == 42
-    assert q.get() == 3.14
+    q.put('A', 0)
+    q.put('B', 0)
+    assert q.get() == 'A'
+    assert q.get() == 'B'
 
 
 def test_sums_priorities_and_doesnt_add():
     q = PriorityQueue()
-    q.put(42, 5)
-    q.put(42, 0)
-    assert q.get() == 42
-    with pytest.raises(EmptyError):
+    q.put('A', 5)
+    q.put('A', 0)
+    assert q.get() == 'A'
+    with pytest.raises(Empty):
         q.get()
 
 
 def test_sums_priorities():
     q = PriorityQueue()
-    q.put(42, 1)
-    q.put(3.14, 2)
-    q.put(42, 2)
-    assert q.get() == 42
+    q.put('A', 1)
+    q.put('B', 2)
+    q.put('A', 2)
+    assert q.get() == 'A'
 
 
 def test_sums_negative_priorities():
     q = PriorityQueue()
-    q.put(42, 3)
-    q.put(3.14, 2)
-    q.put(42, -2)
-    assert q.get() == 3.14
+    q.put('A', 3)
+    q.put('B', 2)
+    q.put('A', -2)
+    assert q.get() == 'B'
+
+
+def test_qsize():
+    q = PriorityQueue()
+    assert q.qsize() == 0
+    q.put('A', 1)
+    assert q.qsize() == 1
+    q.put('B', 1)
+    assert q.qsize() == 2
+    q.get()
+    assert q.qsize() == 1
+
+
+def test_qsize_reflects_merging():
+    q = PriorityQueue()
+    q.put('A', 1)
+    q.put('A', 1)
+    assert q.qsize() == 1
+
+
+def test_empty():
+    q = PriorityQueue()
+    assert q.empty()
+    q.put('A', 1)
+    assert not q.empty()
+
+
+def test_get_empty_raises_exception():
+    q = PriorityQueue()
+    with pytest.raises(Empty):
+        q.get()
+
+
+def test_zero_capacity_is_unlimited():
+    q = PriorityQueue(0)
+    q.put('A', 1)
+    q.put('B', 1)
+    assert q.qsize() == 2
+
+
+def test_put_full_raises_exception():
+    q = PriorityQueue(1)
+    q.put('A', 1)
+    with pytest.raises(Full):
+        q.put('B', 1)
+
+def test_put_duplicate_to_full():
+    q = PriorityQueue(1)
+    q.put('A', 1)
+    assert q.full()
+    q.put('A', 1)
+    assert q.full()

@@ -7,46 +7,52 @@ from queue import Empty, Full
 def test_get_empty():
     q = PriorityQueue()
     with pytest.raises(Empty):
-        q.get()
+        q.get(False)
+
+
+def test_get_empty_nowait():
+    q = PriorityQueue()
+    with pytest.raises(Empty):
+        q.get_nowait()
 
 
 def test_put_get_one_item():
     q = PriorityQueue()
     q.put('A', 0)
-    assert q.get() == 'A'
+    assert q.get_nowait() == 'A'
 
 
 def test_get_removes_item():
     q = PriorityQueue()
     q.put('A', 0)
-    q.get()
+    q.get_nowait()
     with pytest.raises(Empty):
-        q.get()
+        q.get_nowait()
 
 
 def test_get_reflects_priority():
     q = PriorityQueue()
     q.put('A', 0)
     q.put('B', 1)
-    assert q.get() == 'B'
-    assert q.get() == 'A'
+    assert q.get_nowait() == 'B'
+    assert q.get_nowait() == 'A'
 
 
 def test_get_stable_ordering():
     q = PriorityQueue()
     q.put('A', 0)
     q.put('B', 0)
-    assert q.get() == 'A'
-    assert q.get() == 'B'
+    assert q.get_nowait() == 'A'
+    assert q.get_nowait() == 'B'
 
 
 def test_sums_priorities_and_doesnt_add():
     q = PriorityQueue()
     q.put('A', 5)
     q.put('A', 0)
-    assert q.get() == 'A'
+    assert q.get_nowait() == 'A'
     with pytest.raises(Empty):
-        q.get()
+        q.get_nowait()
 
 
 def test_sums_priorities():
@@ -54,7 +60,7 @@ def test_sums_priorities():
     q.put('A', 1)
     q.put('B', 2)
     q.put('A', 2)
-    assert q.get() == 'A'
+    assert q.get_nowait() == 'A'
 
 
 def test_sums_negative_priorities():
@@ -62,7 +68,7 @@ def test_sums_negative_priorities():
     q.put('A', 3)
     q.put('B', 2)
     q.put('A', -2)
-    assert q.get() == 'B'
+    assert q.get_nowait() == 'B'
 
 
 def test_qsize():
@@ -72,7 +78,7 @@ def test_qsize():
     assert q.qsize() == 1
     q.put('B', 1)
     assert q.qsize() == 2
-    q.get()
+    q.get_nowait()
     assert q.qsize() == 1
 
 
@@ -93,7 +99,7 @@ def test_empty():
 def test_get_empty_raises_exception():
     q = PriorityQueue()
     with pytest.raises(Empty):
-        q.get()
+        q.get_nowait()
 
 
 def test_zero_capacity_is_unlimited():

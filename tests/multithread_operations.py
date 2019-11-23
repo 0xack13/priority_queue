@@ -44,7 +44,7 @@ def test_get_blocking_timeout():
     assert isinstance(r[0], Empty)
 
 
-def test_get_blocking_timeout_with_delay(timer):
+def test_get_blocking_timeout_with_delay_doesnt_timout(timer):
     q = PriorityQueue()
     r = []
     t = threading.Thread(target=thread_get, args=(r, q, True, 5))
@@ -55,3 +55,46 @@ def test_get_blocking_timeout_with_delay(timer):
         t.join()
     assert r == ['A']
     assert m.interval < 3
+
+
+def test_multiple_consumers():
+    q = PriorityQueue()
+    r = []
+    t1 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    t2 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    t1.start()
+    t2.start()
+    q.put('A', 2)
+    q.put('B', 1)
+    t1.join()
+    t2.join()
+    assert r == ['A', 'B']
+
+
+def test_multiple_consumers_with_preloaded_queue():
+    q = PriorityQueue()
+    r = []
+    t1 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    t2 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    q.put('B', 1)
+    q.put('A', 2)
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+    assert r == ['A', 'B']
+
+
+def test_multiple_consumers_with_delayed_put():
+    q = PriorityQueue()
+    r = []
+    t1 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    t2 = threading.Thread(target=thread_get, args=(r, q, True, 5))
+    t1.start()
+    t2.start()
+    q.put('A', 2)
+    time.sleep(1)
+    q.put('B', 1)
+    t1.join()
+    t2.join()
+    assert r == ['A', 'B']

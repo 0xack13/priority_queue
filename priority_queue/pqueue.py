@@ -70,11 +70,16 @@ class PriorityQueue:
                 return node.value
         raise Empty()
 
+    def get_n_nowait(self, n):
+        return [self.get_nowait() for i in range(n)]
+
     def get(self, block=True, timeout=None):
+        return self.get_n(1, block, timeout)[0]
+
+    def get_n(self, n, block=True, timeout=None):
         if block:
             with self.access:
-                self.access.wait_for(lambda: self.qsize() >= 1, timeout)
-                return self.get_nowait()
+                self.access.wait_for(lambda: self.qsize() >= n, timeout)
+                return self.get_n_nowait(n)
         else:
-            return self.get_nowait()
-
+            return self.get_n_nowait(n)

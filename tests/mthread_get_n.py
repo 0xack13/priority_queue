@@ -7,13 +7,13 @@ from queue import Empty, Full
 
 
 def thread_get_n(results, queue, n,  blocking=True, timeout=0.1):
-    def _get(results, queue, n, blocking, timeout):
+    def _get_n(results, queue, n, blocking, timeout):
         try:
             r = queue.get_n(n, blocking, timeout)
         except Exception as e:
             r = [e]
         results.extend(r)
-    return threading.Thread(target=_get, args=(results, queue, n,  blocking, timeout))
+    return threading.Thread(target=_get_n, args=(results, queue, n,  blocking, timeout))
 
 
 def test_get_n_from_nonempty():

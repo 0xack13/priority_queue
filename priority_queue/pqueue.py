@@ -42,18 +42,25 @@ class PriorityQueue:
     def empty(self):
         return self.count == 0
 
-    def put(self, value, priority):
+    def put_nowait(self, value, priority):
+        if not self._can_accept(value):
+            raise Full
+        if value in self.entry_finder:
+            orig_node = self._pop_node_by_value(value)
+            priority += orig_node.priority
+            self.count -= 1
+        node = Node(value, priority, next(self.index))
+        self.entry_finder[value] = node
+        heapq.heappush(self.heap, node)
+        self.count += 1
+
+    def _can_accept(self, value):
+        return not self.full() or value in self.entry_finder
+
+    def put(self, value, priority, block=True, timeout=None):
         with self.access:
-            if value in self.entry_finder:
-                orig_node = self._pop_node_by_value(value)
-                priority += orig_node.priority
-                self.count -= 1
-            if self.full():
-                raise Full
-            node = Node(value, priority, next(self.index))
-            self.entry_finder[value] = node
-            heapq.heappush(self.heap, node)
-            self.count += 1
+            self.access.wait_for(lambda: self._can_accept(value), timeout)
+            self.put_nowait(value, priority)
             self.access.notify()
 
     def _pop_node_by_value(self, value):
@@ -80,6 +87,8 @@ class PriorityQueue:
         if block:
             with self.access:
                 self.access.wait_for(lambda: self.qsize() >= n, timeout)
-                return self.get_n_nowait(n)
+                item = self.get_n_nowait(n)
+                self.access.notify()
+                return item
         else:
             return self.get_n_nowait(n)

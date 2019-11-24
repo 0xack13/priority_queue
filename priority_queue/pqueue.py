@@ -73,7 +73,8 @@ class PriorityQueue:
     def get(self, block=True, timeout=None):
         if block:
             with self.access:
-                self.access.wait_for(self.qsize, timeout)
+                self.access.wait_for(lambda: self.qsize() >= 1, timeout)
                 return self.get_nowait()
         else:
             return self.get_nowait()
+

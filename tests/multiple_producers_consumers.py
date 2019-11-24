@@ -1,35 +1,7 @@
-import threading
 import string
+
 from priority_queue.pqueue import PriorityQueue
-
-
-def thread_put(errors, queue, value, priority, block=True, timeout=0.3):
-    def _put(errors, queue, value, priority, block, timeout):
-        try:
-            queue.put(value, priority, block, timeout)
-        except Exception as e:
-            errors.append(e)
-    return threading.Thread(target=_put, args=(errors, queue, value, priority, block, timeout))
-
-
-def thread_get(results, queue, block=True, timeout=0.3):
-    def _get(results, queue, block, timeout):
-        try:
-            r = queue.get(block, timeout)
-        except Exception as e:
-            r = e
-        results.append(r)
-    return threading.Thread(target=_get, args=(results, queue, block, timeout))
-
-
-def thread_get_n(results, queue, n,  block=True, timeout=0.1):
-    def _get_n(results, queue, n, block, timeout):
-        try:
-            r = queue.get_n(n, block, timeout)
-        except Exception as e:
-            r = [e]
-        results.extend(r)
-    return threading.Thread(target=_get_n, args=(results, queue, n,  block, timeout))
+from .conftest import thread_get, thread_put, thread_get_n
 
 
 def test_many_producers_and_consumers():

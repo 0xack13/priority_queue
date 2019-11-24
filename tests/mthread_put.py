@@ -1,18 +1,8 @@
-import pytest
-import threading
 import time
-from queue import Empty, Full
 
 from priority_queue.pqueue import PriorityQueue
-
-
-def thread_put(errors, queue, value, priority, block=True, timeout=0.1):
-    def _put(errors, queue, value, priority, block, timeout):
-        try:
-            queue.put(value, priority, block, timeout)
-        except Exception as e:
-            errors.append(e)
-    return threading.Thread(target=_put, args=(errors, queue, value, priority, block, timeout))
+from queue import Full
+from .conftest import thread_put
 
 
 def test_put_no_delay():

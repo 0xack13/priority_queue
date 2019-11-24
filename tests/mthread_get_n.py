@@ -1,19 +1,8 @@
-import pytest
-import threading
 import time
 
 from priority_queue.pqueue import PriorityQueue
-from queue import Empty, Full
-
-
-def thread_get_n(results, queue, n,  block=True, timeout=0.1):
-    def _get_n(results, queue, n, block, timeout):
-        try:
-            r = queue.get_n(n, block, timeout)
-        except Exception as e:
-            r = [e]
-        results.extend(r)
-    return threading.Thread(target=_get_n, args=(results, queue, n,  block, timeout))
+from queue import Empty
+from .conftest import thread_get_n
 
 
 def test_get_n_from_nonempty():

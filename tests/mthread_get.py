@@ -6,14 +6,14 @@ from priority_queue.pqueue import PriorityQueue
 from queue import Empty, Full
 
 
-def thread_get(results, queue, blocking=True, timeout=0.1):
-    def _get(results, queue, blocking, timeout):
+def thread_get(results, queue, block=True, timeout=0.1):
+    def _get(results, queue, block, timeout):
         try:
-            r = queue.get(blocking, timeout)
+            r = queue.get(block, timeout)
         except Exception as e:
             r = e
         results.append(r)
-    return threading.Thread(target=_get, args=(results, queue, blocking, timeout))
+    return threading.Thread(target=_get, args=(results, queue, block, timeout))
 
 
 def test_get_blocking_result_from_nonempty():

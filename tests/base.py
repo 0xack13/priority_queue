@@ -113,7 +113,7 @@ def test_put_full_raises_exception():
     q = PriorityQueue(1)
     q.put('A', 1)
     with pytest.raises(Full):
-        q.put('B', 1)
+        q.put_nowait('B', 1)
 
 def test_put_duplicate_to_full():
     q = PriorityQueue(1)

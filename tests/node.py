@@ -1,5 +1,3 @@
-import pytest
-
 from priority_queue.pqueue import Node
 
 

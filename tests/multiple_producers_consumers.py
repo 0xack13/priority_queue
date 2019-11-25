@@ -22,11 +22,13 @@ def test_many_producers_and_one_getn_consumer():
     q = PriorityQueue()
     r = []
     threads = []
+    t_get = thread_get_n(r, q, len(string.ascii_letters))
+    t_get.start()
     for priority, letter in enumerate(string.ascii_letters):
-        threads.append(thread_put(r, q, letter, priority))
-    threads.append(thread_get_n(r, q, len(string.ascii_letters)))
+        threads.append(thread_put(r, q, letter, -priority)) # Reverse pririty
     for t in threads:
         t.start()
     for t in threads:
         t.join()
-    assert sorted(r) == sorted(string.ascii_letters)
+    t_get.join()
+    assert r == list(string.ascii_letters)

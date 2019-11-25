@@ -78,7 +78,7 @@ class PriorityQueue:
         raise Empty()
 
     def get_n_nowait(self, n):
-        return [self.get_nowait() for i in range(n)]
+        return [self.get_nowait() for i in range(n)] # FIX: This might not be thread-safe.
 
     def get(self, block=True, timeout=None):
         return self.get_n(1, block, timeout)[0]
